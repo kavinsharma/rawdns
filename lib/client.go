@@ -41,10 +41,11 @@ func NewClient(cfg ClientConfig) (c Client, err error) {
 // marshall the query
 // unmarshall the answer
 // grab the ips from the answer
-func (c *Client) LookupAddr(addr string) (ips []string, err error) {
+func (c *Client) LookupAddr(addr string) (ips []string, ans *RR, err error) {
 	var (
 		id      uint16
 		payload []byte
+		answer1 *RR
 	)
 
 	func() {
@@ -102,9 +103,13 @@ func (c *Client) LookupAddr(addr string) (ips []string, err error) {
 
 	for _, answer := range responseMsg.Answers {
 		fmt.Printf("ANSWER: %+v\n", answer.RDATA)
+		answer1 = answer
 	}
-
+	if answer1 != nil {
+		return nil, answer1, nil
+	}
 	return
+
 }
 
 func (c *Client) Close() {
